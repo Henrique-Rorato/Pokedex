@@ -47,20 +47,32 @@ async function fetchPokemonList() {
         const response = await fetch(`${API_BASE}/pokemon?limit=1025&offset=0`);
         const data = await response.json();
         
-        // Buscar detalhes de cada Pokémon
-        const pokemonDetails = await Promise.all(
-            data.results.map(pokemon => fetch(pokemon.url).then(res => res.json()))
-        );
+        const pokemonDetails = [];
+        const batchSize = 50;
+
+        for (let i = 0; i < data.results.length; i += batchSize) {
+            const batch = data.results.slice(i, i + batchSize);
+            const fetchedBatch = await Promise.all(
+                batch.map(pokemon => fetch(pokemon.url).then(res => res.json()))
+            );
+            pokemonDetails.push(...fetchedBatch);
+            state.allPokemon = pokemonDetails;
+            state.filteredPokemon = pokemonDetails;
+            displayPokemon();
+        }
         
         state.allPokemon = pokemonDetails;
         state.filteredPokemon = pokemonDetails;
-        
         displayPokemon();
     } catch (error) {
         console.error('Erro ao buscar Pokémon:', error);
         pokemonGrid.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Erro ao carregar Pokémon</p></div>';
     }
 }
+
+/**
+ * Extrai o ID do Pokémon a partir da URL de detalhe
+ */
 
 /**
  * Busca até duas cartas TCG do Pokémon se disponíveis
@@ -98,21 +110,19 @@ function displayPokemon() {
     pokemonGrid.innerHTML = state.filteredPokemon.map(pokemon => {
         const favoriteIcon = pokemon.name.toLowerCase() === 'marshadow' ? '<i class="fas fa-heart favorite-icon" title="Melhor Pokémon"></i>' : '';
         const cardClass = pokemon.name.toLowerCase() === 'marshadow' ? 'pokemon-card marshadow-card' : 'pokemon-card';
+        const imageContent = `<img src="${pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}" alt="${pokemon.name}" class="pokemon-image">`;
+        const typeBadges = pokemon.types.map(type => `<span class="type-badge type-${type.type.name}">${type.type.name}</span>`).join('');
+
         return `
         <div class="${cardClass}" onclick="showPokemonDetail(${pokemon.id})">
             <div class="pokemon-id">#${String(pokemon.id).padStart(4, '0')}</div>
-            <img src="${pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}" 
-                 alt="${pokemon.name}" 
-                 class="pokemon-image">
+            ${imageContent}
             <div class="pokemon-name">${pokemon.name} ${favoriteIcon}</div>
-            <div class="pokemon-types">
-                ${pokemon.types.map(type => `
-                    <span class="type-badge type-${type.type.name}">${type.type.name}</span>
-                `).join('')}
-            </div>
+            <div class="pokemon-types">${typeBadges}</div>
         </div>
     `;
     }).join('');
+
 }
 
 /**
@@ -139,44 +149,42 @@ function filterPokemon() {
  * Mostra detalhes do Pokémon no modal
  */
 async function showPokemonDetail(pokemonId) {
-    const pokemon = state.allPokemon.find(p => p.id === pokemonId);
+    const detail = state.allPokemon.find(p => p.id === pokemonId);
     
-    if (!pokemon) return;
+    if (!detail) return;
 
-    const stats = pokemon.stats.map(stat => ({
+    const stats = detail.stats.map(stat => ({
         name: stat.stat.name,
         value: stat.base_stat,
         maxValue: 255
     }));
 
-    const abilities = pokemon.abilities.map(ability => ability.ability.name).join(', ');
+    const abilities = detail.abilities.map(ability => ability.ability.name).join(', ');
 
-    const favoriteIcon = pokemon.name.toLowerCase() === 'marshadow' ? '<i class="fas fa-heart favorite-icon" title="Melhor Pokémon"></i>' : '';
+    const favoriteIcon = detail.name.toLowerCase() === 'marshadow' ? '<i class="fas fa-heart favorite-icon" title="Melhor Pokémon"></i>' : '';
     const hp = stats.find(stat => stat.name === 'hp')?.value || 0;
-    const tcgCards = await fetchPokemonTcgCards(pokemon.name);
-    const defaultImage = pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default;
+    const tcgCards = await fetchPokemonTcgCards(detail.name);
+    const defaultImage = detail.sprites.other['official-artwork'].front_default || detail.sprites.front_default;
     const cardImages = [
         tcgCards[0] || { image: defaultImage, title: 'Carta oficial' },
         tcgCards[1] || tcgCards[0] || { image: defaultImage, title: 'Carta EX/GX' }
     ];
     modalBody.innerHTML = `
         <div class="pokemon-detail-header">
-            <img src="${pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}" 
-                 alt="${pokemon.name}" 
+            <img src="${detail.sprites.other['official-artwork'].front_default || detail.sprites.front_default}" 
+                 alt="${detail.name}" 
                  class="pokemon-detail-image">
-            <div class="pokemon-detail-name">${pokemon.name} ${favoriteIcon}</div>
-            <div class="pokemon-id">#${String(pokemon.id).padStart(4, '0')}</div>
+            <div class="pokemon-detail-name">${detail.name} ${favoriteIcon}</div>
+            <div class="pokemon-id">#${String(detail.id).padStart(4, '0')}</div>
             <div class="pokemon-types">
-                ${pokemon.types.map(type => `
-                    <span class="type-badge type-${type.type.name}">${type.type.name}</span>
-                `).join('')}
+                ${detail.types.map(type => `<span class="type-badge type-${type.type.name}">${type.type.name}</span>`).join('')}
             </div>
         </div>
 
         <div style="margin: 1.5rem 0;">
             <h3 style="margin-bottom: 0.5rem;">Informações</h3>
-            <p><strong>Altura:</strong> ${(pokemon.height / 10).toFixed(1)} m</p>
-            <p><strong>Peso:</strong> ${(pokemon.weight / 10).toFixed(1)} kg</p>
+            <p><strong>Altura:</strong> ${(detail.height / 10).toFixed(1)} m</p>
+            <p><strong>Peso:</strong> ${(detail.weight / 10).toFixed(1)} kg</p>
             <p><strong>Habilidades:</strong> ${abilities}</p>
         </div>
 
