@@ -71,7 +71,7 @@ function displayPokemon() {
 
     pokemonGrid.innerHTML = state.filteredPokemon.map(pokemon => `
         <div class="pokemon-card" onclick="showPokemonDetail(${pokemon.id})">
-            <div class="pokemon-id">#${String(pokemon.id).padStart(3, '0')}</div>
+            <div class="pokemon-id">#${pokemon.id}</div>
             <img src="${pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}" 
                  alt="${pokemon.name}" 
                  class="pokemon-image">
@@ -90,8 +90,11 @@ function displayPokemon() {
  */
 function filterPokemon() {
     state.filteredPokemon = state.allPokemon.filter(pokemon => {
-        const matchesSearch = pokemon.name.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
-                            pokemon.id.toString().includes(state.searchQuery);
+        const query = state.searchQuery.toLowerCase();
+        const isIdSearch = query.startsWith('#');
+        const cleanQuery = isIdSearch ? query.slice(1) : query;
+        const matchesSearch = pokemon.name.toLowerCase().includes(cleanQuery) ||
+                            (isIdSearch ? pokemon.id.toString() === cleanQuery : pokemon.id.toString().includes(cleanQuery));
         
         const matchesType = state.selectedType === '' || 
                           pokemon.types.some(type => type.type.name === state.selectedType);
@@ -124,7 +127,7 @@ function showPokemonDetail(pokemonId) {
                  alt="${pokemon.name}" 
                  class="pokemon-detail-image">
             <div class="pokemon-detail-name">${pokemon.name}</div>
-            <div class="pokemon-id">#${String(pokemon.id).padStart(3, '0')}</div>
+            <div class="pokemon-id">#${pokemon.id}</div>
             <div class="pokemon-types">
                 ${pokemon.types.map(type => `
                     <span class="type-badge type-${type.type.name}">${type.type.name}</span>
