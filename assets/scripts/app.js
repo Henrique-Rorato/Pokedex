@@ -63,20 +63,26 @@ async function fetchPokemonList() {
 }
 
 /**
- * Busca a primeira imagem de carta TCG do Pokémon se disponível
+ * Busca até duas cartas TCG do Pokémon se disponíveis
  */
-async function fetchPokemonTcgCardImage(pokemonName) {
+async function fetchPokemonTcgCards(pokemonName) {
     try {
-        const url = `${TCG_API_BASE}/cards?q=name:"${pokemonName}"&pageSize=1`;
+        const url = `${TCG_API_BASE}/cards?q=name:"${pokemonName}"&pageSize=4`;
         const headers = TCG_API_KEY ? { 'X-Api-Key': TCG_API_KEY } : {};
         const response = await fetch(url, { headers });
-        if (!response.ok) return null;
+        if (!response.ok) return [];
 
         const data = await response.json();
-        return data.data && data.data[0] && data.data[0].images && data.data[0].images.large ? data.data[0].images.large : null;
+        return (data.data || [])
+            .filter(card => card.images && card.images.large)
+            .slice(0, 2)
+            .map(card => ({
+                image: card.images.large,
+                title: card.name
+            }));
     } catch (error) {
-        console.warn('Não foi possível buscar a imagem TCG:', error);
-        return null;
+        console.warn('Não foi possível buscar as cartas TCG:', error);
+        return [];
     }
 }
 
@@ -146,11 +152,13 @@ async function showPokemonDetail(pokemonId) {
     const abilities = pokemon.abilities.map(ability => ability.ability.name).join(', ');
 
     const favoriteIcon = pokemon.name.toLowerCase() === 'marshadow' ? '<i class="fas fa-heart favorite-icon" title="Melhor Pokémon"></i>' : '';
-    const primaryType = pokemon.types[0].type.name;
     const hp = stats.find(stat => stat.name === 'hp')?.value || 0;
-    const attackMoves = pokemon.moves.slice(0, 2).map(move => move.move.name.replace(/-/g, ' '));
-    const tcgImage = await fetchPokemonTcgCardImage(pokemon.name);
-    const cardImage = tcgImage || (pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default);
+    const tcgCards = await fetchPokemonTcgCards(pokemon.name);
+    const defaultImage = pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default;
+    const cardImages = [
+        tcgCards[0] || { image: defaultImage, title: 'Carta oficial' },
+        tcgCards[1] || tcgCards[0] || { image: defaultImage, title: 'Carta EX/GX' }
+    ];
     modalBody.innerHTML = `
         <div class="pokemon-detail-header">
             <img src="${pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}" 
@@ -187,32 +195,15 @@ async function showPokemonDetail(pokemonId) {
             </div>
         </div>
 
-        <div class="pokemon-tcg-card">
-            <div class="tcg-header">
-                <div class="tcg-top-left">
-                    <span class="tcg-hp">HP ${hp}</span>
-                    <span class="tcg-type-badge type-${primaryType}">${primaryType}</span>
+        <div class="pokemon-tcg-row">
+            ${cardImages.map((card, index) => `
+                <div class="pokemon-tcg-card-img">
+                    <div class="tcg-card-badge">${card.title.toUpperCase().includes('GX') || card.title.toUpperCase().includes('EX') ? card.title.match(/(GX|EX)/i)?.[0].toUpperCase() : `Card ${index + 1}`}</div>
+                    <img src="${card.image}" 
+                         alt="${pokemon.name} carta ${index + 1}" 
+                         class="tcg-card-img">
                 </div>
-                <div class="tcg-rarity">★</div>
-            </div>
-            <div class="tcg-art">
-                <img src="${cardImage}" 
-                     alt="${pokemon.name}" 
-                     class="tcg-art-image">
-            </div>
-            <div class="tcg-body">
-                <div class="tcg-card-title">${pokemon.name} ${favoriteIcon}</div>
-                <div class="tcg-card-subtitle">Pokémon ${pokemon.species?.name || 'Colecionável'}</div>
-                <div class="tcg-attacks">
-                    ${attackMoves.map((move, index) => `
-                        <div class="tcg-attack">
-                            <div class="tcg-attack-name">${move}</div>
-                            <div class="tcg-attack-damage">${20 + index * 20} dmg</div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="tcg-footer">Set: Pokédex Collector • Raridade: ${pokemon.types.length > 1 ? 'Raro' : 'Comum'}</div>
-            </div>
+            `).join('')}
         </div>
     `;
 

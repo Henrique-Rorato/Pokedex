@@ -457,6 +457,175 @@ body.dark-mode .close-btn {
     border-radius: var(--border-radius);
 }
 
+.pokemon-tcg-card {
+    margin-top: 2rem;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    background: linear-gradient(180deg, #fff 0%, #f7f5ff 100%);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+body.dark-mode .pokemon-tcg-card {
+    background: linear-gradient(180deg, #292a33 0%, #1d1e26 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.tcg-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+}
+
+.tcg-top-left {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.tcg-hp {
+    font-weight: 900;
+    color: #d62828;
+}
+
+.tcg-type-badge {
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.tcg-rarity {
+    font-size: 1.3rem;
+    color: #777;
+}
+
+.tcg-art {
+    position: relative;
+    background: radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.7), transparent 45%);
+    padding: 1rem;
+}
+
+.tcg-art-image {
+    width: 100%;
+    height: 280px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
+.tcg-body {
+    padding: 1rem 1.5rem 1.5rem;
+}
+
+.tcg-card-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    text-transform: capitalize;
+    margin-bottom: 0.4rem;
+}
+
+.tcg-card-subtitle {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 1rem;
+    text-transform: capitalize;
+}
+
+body.dark-mode .tcg-card-subtitle {
+    color: #bbb;
+}
+
+.pokemon-tcg-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.pokemon-tcg-card-img {
+    background: var(--light-bg);
+    border-radius: 24px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+body.dark-mode .pokemon-tcg-card-img {
+    background: #232323;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.tcg-card-badge {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #444;
+    text-transform: uppercase;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .tcg-card-badge {
+    color: #eee;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.tcg-card-img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 18px;
+}
+
+
+.tcg-attacks {
+    display: grid;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.tcg-attack {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 1rem;
+    background: rgba(245, 245, 245, 0.8);
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+body.dark-mode .tcg-attack {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.tcg-attack-name {
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.tcg-attack-damage {
+    font-weight: 700;
+    color: #d62828;
+}
+
+.tcg-footer {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+body.dark-mode .tcg-footer {
+    color: #ccc;
+}
+
 body.dark-mode .stat {
     background: #3a3a3a;
 }
