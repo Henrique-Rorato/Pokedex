@@ -1,0 +1,18 @@
+{
+  "name": "pokedex",
+  "version": "1.0.0",
+  "description": "Uma Pokédex interativa para explorar e aprender sobre Pokémon",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000"
+  },
+  "keywords": [
+    "pokemon",
+    "pokedex",
+    "interactive"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}
