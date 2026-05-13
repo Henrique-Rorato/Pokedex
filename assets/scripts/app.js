@@ -93,8 +93,9 @@ function filterPokemon() {
         const query = state.searchQuery.toLowerCase();
         const isIdSearch = query.startsWith('#');
         const cleanQuery = isIdSearch ? query.slice(1) : query;
+        const paddedId = String(pokemon.id).padStart(4, '0');
         const matchesSearch = pokemon.name.toLowerCase().includes(cleanQuery) ||
-                            (isIdSearch ? pokemon.id == parseInt(cleanQuery) : pokemon.id.toString().includes(cleanQuery));
+                            (isIdSearch ? pokemon.id == parseInt(cleanQuery) : paddedId.includes(cleanQuery));
         
         const matchesType = state.selectedType === '' || 
                           pokemon.types.some(type => type.type.name === state.selectedType);
