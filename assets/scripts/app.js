@@ -42,7 +42,7 @@ async function fetchPokemonList() {
     try {
         pokemonGrid.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i><p>Carregando Pokémon...</p></div>';
         
-        const response = await fetch(`${API_BASE}/pokemon?limit=1010&offset=0`);
+        const response = await fetch(`${API_BASE}/pokemon?limit=1025&offset=0`);
         const data = await response.json();
         
         // Buscar detalhes de cada Pokémon
