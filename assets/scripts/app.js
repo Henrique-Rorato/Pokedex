@@ -94,7 +94,7 @@ function filterPokemon() {
         const isIdSearch = query.startsWith('#');
         const cleanQuery = isIdSearch ? query.slice(1) : query;
         const matchesSearch = pokemon.name.toLowerCase().includes(cleanQuery) ||
-                            (isIdSearch ? pokemon.id.toString() === cleanQuery : pokemon.id.toString().includes(cleanQuery));
+                            (isIdSearch ? pokemon.id == parseInt(cleanQuery) : pokemon.id.toString().includes(cleanQuery));
         
         const matchesType = state.selectedType === '' || 
                           pokemon.types.some(type => type.type.name === state.selectedType);
