@@ -208,7 +208,7 @@ async function showPokemonDetail(pokemonId) {
                 <div class="pokemon-tcg-card-img">
                     <div class="tcg-card-badge">${card.title.toUpperCase().includes('GX') || card.title.toUpperCase().includes('EX') ? card.title.match(/(GX|EX)/i)?.[0].toUpperCase() : `Card ${index + 1}`}</div>
                     <img src="${card.image}" 
-                         alt="${pokemon.name} carta ${index + 1}" 
+                         alt="${detail.name} carta ${index + 1}" 
                          class="tcg-card-img">
                 </div>
             `).join('')}
