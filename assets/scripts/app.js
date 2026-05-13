@@ -3,6 +3,8 @@
 // ===========================
 
 const API_BASE = 'https://pokeapi.co/api/v2';
+const TCG_API_BASE = 'https://api.pokemontcg.io/v2';
+const TCG_API_KEY = ''; // opcional: defina sua chave da Pokémon TCG API aqui
 const POKEMON_PER_PAGE = 50;
 
 // ===========================
@@ -61,6 +63,24 @@ async function fetchPokemonList() {
 }
 
 /**
+ * Busca a primeira imagem de carta TCG do Pokémon se disponível
+ */
+async function fetchPokemonTcgCardImage(pokemonName) {
+    try {
+        const url = `${TCG_API_BASE}/cards?q=name:"${pokemonName}"&pageSize=1`;
+        const headers = TCG_API_KEY ? { 'X-Api-Key': TCG_API_KEY } : {};
+        const response = await fetch(url, { headers });
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        return data.data && data.data[0] && data.data[0].images && data.data[0].images.large ? data.data[0].images.large : null;
+    } catch (error) {
+        console.warn('Não foi possível buscar a imagem TCG:', error);
+        return null;
+    }
+}
+
+/**
  * Exibe os Pokémon na grade
  */
 function displayPokemon() {
@@ -112,7 +132,7 @@ function filterPokemon() {
 /**
  * Mostra detalhes do Pokémon no modal
  */
-function showPokemonDetail(pokemonId) {
+async function showPokemonDetail(pokemonId) {
     const pokemon = state.allPokemon.find(p => p.id === pokemonId);
     
     if (!pokemon) return;
@@ -126,6 +146,11 @@ function showPokemonDetail(pokemonId) {
     const abilities = pokemon.abilities.map(ability => ability.ability.name).join(', ');
 
     const favoriteIcon = pokemon.name.toLowerCase() === 'marshadow' ? '<i class="fas fa-heart favorite-icon" title="Melhor Pokémon"></i>' : '';
+    const primaryType = pokemon.types[0].type.name;
+    const hp = stats.find(stat => stat.name === 'hp')?.value || 0;
+    const attackMoves = pokemon.moves.slice(0, 2).map(move => move.move.name.replace(/-/g, ' '));
+    const tcgImage = await fetchPokemonTcgCardImage(pokemon.name);
+    const cardImage = tcgImage || (pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default);
     modalBody.innerHTML = `
         <div class="pokemon-detail-header">
             <img src="${pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}" 
@@ -159,6 +184,34 @@ function showPokemonDetail(pokemonId) {
                         </div>
                     </div>
                 `).join('')}
+            </div>
+        </div>
+
+        <div class="pokemon-tcg-card">
+            <div class="tcg-header">
+                <div class="tcg-top-left">
+                    <span class="tcg-hp">HP ${hp}</span>
+                    <span class="tcg-type-badge type-${primaryType}">${primaryType}</span>
+                </div>
+                <div class="tcg-rarity">★</div>
+            </div>
+            <div class="tcg-art">
+                <img src="${cardImage}" 
+                     alt="${pokemon.name}" 
+                     class="tcg-art-image">
+            </div>
+            <div class="tcg-body">
+                <div class="tcg-card-title">${pokemon.name} ${favoriteIcon}</div>
+                <div class="tcg-card-subtitle">Pokémon ${pokemon.species?.name || 'Colecionável'}</div>
+                <div class="tcg-attacks">
+                    ${attackMoves.map((move, index) => `
+                        <div class="tcg-attack">
+                            <div class="tcg-attack-name">${move}</div>
+                            <div class="tcg-attack-damage">${20 + index * 20} dmg</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="tcg-footer">Set: Pokédex Collector • Raridade: ${pokemon.types.length > 1 ? 'Raro' : 'Comum'}</div>
             </div>
         </div>
     `;
