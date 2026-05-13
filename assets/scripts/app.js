@@ -69,20 +69,23 @@ function displayPokemon() {
         return;
     }
 
-    pokemonGrid.innerHTML = state.filteredPokemon.map(pokemon => `
+    pokemonGrid.innerHTML = state.filteredPokemon.map(pokemon => {
+        const favoriteIcon = pokemon.name.toLowerCase() === 'marshadow' ? '<i class="fas fa-heart favorite-icon" title="Melhor Pokémon"></i>' : '';
+        return `
         <div class="pokemon-card" onclick="showPokemonDetail(${pokemon.id})">
             <div class="pokemon-id">#${String(pokemon.id).padStart(4, '0')}</div>
             <img src="${pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}" 
                  alt="${pokemon.name}" 
                  class="pokemon-image">
-            <div class="pokemon-name">${pokemon.name}</div>
+            <div class="pokemon-name">${pokemon.name} ${favoriteIcon}</div>
             <div class="pokemon-types">
                 ${pokemon.types.map(type => `
                     <span class="type-badge type-${type.type.name}">${type.type.name}</span>
                 `).join('')}
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 /**
@@ -121,12 +124,13 @@ function showPokemonDetail(pokemonId) {
 
     const abilities = pokemon.abilities.map(ability => ability.ability.name).join(', ');
 
+    const favoriteIcon = pokemon.name.toLowerCase() === 'marshadow' ? '<i class="fas fa-heart favorite-icon" title="Melhor Pokémon"></i>' : '';
     modalBody.innerHTML = `
         <div class="pokemon-detail-header">
             <img src="${pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}" 
                  alt="${pokemon.name}" 
                  class="pokemon-detail-image">
-            <div class="pokemon-detail-name">${pokemon.name}</div>
+            <div class="pokemon-detail-name">${pokemon.name} ${favoriteIcon}</div>
             <div class="pokemon-id">#${String(pokemon.id).padStart(4, '0')}</div>
             <div class="pokemon-types">
                 ${pokemon.types.map(type => `

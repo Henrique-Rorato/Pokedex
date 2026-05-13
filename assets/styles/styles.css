@@ -246,6 +246,15 @@ body.dark-mode .pokemon-image {
     font-weight: bold;
     margin-bottom: 0.5rem;
     text-transform: capitalize;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.favorite-icon {
+    color: #e63946;
+    font-size: 1rem;
 }
 
 .pokemon-types {
