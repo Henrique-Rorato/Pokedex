@@ -235,17 +235,6 @@ body.dark-mode .pokemon-card {
     pointer-events: none;
 }
 
-.marshadow-card::after {
-    content: '⚡';
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 2rem;
-    transform: rotate(15deg);
-    pointer-events: none;
-}
-
 .marshadow-card .pokemon-name {
     color: #fff;
 }
