@@ -40,7 +40,7 @@ body.dark-mode {
    HEADER
    =========================== */
 
-.header {
+.header{
     background: linear-gradient(135deg, var(--primary-color), #ff6b6b);
     color: white;
     padding: 1.5rem 0;
@@ -216,6 +216,56 @@ body.dark-mode .pokemon-card {
     transform: translateY(-8px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     border-color: var(--primary-color);
+}
+
+.marshadow-card {
+    background: linear-gradient(180deg, #2b2036 0%, #4d3a60 100%);
+    border: 2px solid rgba(255, 91, 154, 0.9);
+    box-shadow: 0 0 0 4px rgba(255, 91, 154, 0.15), 0 20px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.marshadow-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.25), transparent 32%);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.marshadow-card::after {
+    content: '⚡';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 2rem;
+    transform: rotate(15deg);
+    pointer-events: none;
+}
+
+.marshadow-card .pokemon-name {
+    color: #fff;
+}
+
+.marshadow-card .pokemon-id {
+    color: #f8c0e3;
+}
+
+.marshadow-card .pokemon-types {
+    justify-content: center;
+}
+
+.marshadow-card .type-badge {
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.marshadow-card .pokemon-image {
+    border: 3px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.12);
 }
 
 .pokemon-id {

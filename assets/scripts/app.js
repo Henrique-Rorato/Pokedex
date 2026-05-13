@@ -71,8 +71,9 @@ function displayPokemon() {
 
     pokemonGrid.innerHTML = state.filteredPokemon.map(pokemon => {
         const favoriteIcon = pokemon.name.toLowerCase() === 'marshadow' ? '<i class="fas fa-heart favorite-icon" title="Melhor Pokémon"></i>' : '';
+        const cardClass = pokemon.name.toLowerCase() === 'marshadow' ? 'pokemon-card marshadow-card' : 'pokemon-card';
         return `
-        <div class="pokemon-card" onclick="showPokemonDetail(${pokemon.id})">
+        <div class="${cardClass}" onclick="showPokemonDetail(${pokemon.id})">
             <div class="pokemon-id">#${String(pokemon.id).padStart(4, '0')}</div>
             <img src="${pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}" 
                  alt="${pokemon.name}" 
