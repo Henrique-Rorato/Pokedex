@@ -170,7 +170,7 @@ body.dark-mode .filter-select {
     color: var(--text-light);
 }
 
-..filter-select:focus {
+.filter-select:focus {
     outline: none;
     border-color: var(--primary-color);
 }

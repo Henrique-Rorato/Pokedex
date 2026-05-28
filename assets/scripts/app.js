@@ -16,6 +16,7 @@ const state = {
     filteredPokemon: [],
     currentPage: 0,
     selectedType: '',
+    selectedOrder: 'id-asc',
     searchQuery: '',
     isDarkMode: localStorage.getItem('darkMode') === 'true'
 };
@@ -28,6 +29,7 @@ const pokemonGrid = document.getElementById('pokemonGrid');
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
 const typeFilter = document.getElementById('typeFilter');
+const orderFilter = document.getElementById('orderFilter');
 const themeToggle = document.getElementById('themeToggle');
 const detailModal = document.getElementById('detailModal');
 const closeBtn = document.getElementById('closeBtn');
@@ -79,12 +81,20 @@ async function fetchPokemonList() {
  */
 async function fetchPokemonTcgCards(pokemonName) {
     try {
-        const url = `${TCG_API_BASE}/cards?q=name:"${pokemonName}"&pageSize=4`;
-        const headers = TCG_API_KEY ? { 'X-Api-Key': TCG_API_KEY } : {};
-        const response = await fetch(url, { headers });
-        if (!response.ok) return [];
+        // Tentar busca exata primeiro
+        let url = `${TCG_API_BASE}/cards?q=name:"${pokemonName}"&pageSize=4`;
+        let headers = TCG_API_KEY ? { 'X-Api-Key': TCG_API_KEY } : {};
+        let response = await fetch(url, { headers });
+        let data = response.ok ? await response.json() : { data: [] };
 
-        const data = await response.json();
+        // Se não encontrou, tentar busca parcial (sem aspas)
+        if (!data.data || data.data.length === 0) {
+            url = `${TCG_API_BASE}/cards?q=name:${pokemonName}*&pageSize=4`;
+            response = await fetch(url, { headers });
+            data = response.ok ? await response.json() : { data: [] };
+        }
+
+        console.log(`TCG para ${pokemonName}:`, data.data?.length || 0, 'cartas encontradas');
         return (data.data || [])
             .filter(card => card.images && card.images.large)
             .slice(0, 2)
@@ -142,7 +152,22 @@ function filterPokemon() {
         return matchesSearch && matchesType;
     });
 
+    sortPokemon();
     displayPokemon();
+}
+
+function sortPokemon() {
+    state.filteredPokemon.sort((a, b) => {
+        switch (state.selectedOrder) {
+            case 'name-asc':
+                return a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' });
+            case 'id-desc':
+                return b.id - a.id;
+            case 'id-asc':
+            default:
+                return a.id - b.id;
+        }
+    });
 }
 
 /**
@@ -166,8 +191,8 @@ async function showPokemonDetail(pokemonId) {
     const tcgCards = await fetchPokemonTcgCards(detail.name);
     const defaultImage = detail.sprites.other['official-artwork'].front_default || detail.sprites.front_default;
     const cardImages = [
-        tcgCards[0] || { image: defaultImage, title: 'Carta oficial' },
-        tcgCards[1] || tcgCards[0] || { image: defaultImage, title: 'Carta EX/GX' }
+        tcgCards[0] || { image: defaultImage, title: 'Imagem oficial' },
+        tcgCards[1] || { image: defaultImage, title: 'Imagem oficial' }
     ];
     modalBody.innerHTML = `
         <div class="pokemon-detail-header">
@@ -236,6 +261,11 @@ searchInput.addEventListener('keyup', (e) => {
 
 typeFilter.addEventListener('change', (e) => {
     state.selectedType = e.target.value;
+    filterPokemon();
+});
+
+orderFilter.addEventListener('change', (e) => {
+    state.selectedOrder = e.target.value;
     filterPokemon();
 });
 
