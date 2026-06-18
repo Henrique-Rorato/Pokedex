@@ -364,6 +364,33 @@ body.dark-mode .pokemon-image {
     color: var(--primary-color);
 }
 
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0 0;
+}
+
+.page-btn {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--primary-color);
+    background: white;
+    color: var(--primary-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-info {
+    font-weight: 700;
+}
+
 .empty-state {
     grid-column: 1 / -1;
     text-align: center;
